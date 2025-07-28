@@ -6,6 +6,7 @@
   },
   "tiledWeb": {
     "upload": "Open zip project",
-    "savedProjects": "Saved Projects"
+    "savedProjects": "Saved Projects",
+    "closeProject": "Close project"
   }
 }

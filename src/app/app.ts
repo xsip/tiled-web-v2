@@ -51,7 +51,10 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
     JsonPipe
   ],
   template: `
-    <tiled-web-ui-main-container (projectUpload)="projectUpload($event)">
+    <tiled-web-ui-main-container
+      (projectUpload)="projectUpload($event)"
+      (projectClosed)="projectClosed()"
+    >
       {{ jsonFilesOnly | json }}
       <div body class="h-full w-full flex ">
         @if (jsonFilesOnly.length && !tileData) {
@@ -234,6 +237,9 @@ export class App implements OnInit {
       this.tileData = res2;
       const img = await TiledMapParser.createMapCanvas(res2, 0, 0, 1);
       const container = document.getElementById('container')! as HTMLDivElement;
+      const oldCanvas = container.querySelector('canvas');
+      if(oldCanvas)
+        container.removeChild(oldCanvas);
       container!.appendChild(img.canvas);
       img.canvas.style.width = container.clientWidth + 'px';
       img.canvas.style.height = container.clientHeight + 'px';
@@ -264,6 +270,18 @@ export class App implements OnInit {
 
   get jsonFilesOnly() {
     return this.zipFiles.filter(f => f.name.endsWith('.json'));
+  }
+
+  projectClosed() {
+    const canvasContainer = document.getElementById('tilesetCanvas')! as HTMLDivElement;
+    const canvas = canvasContainer.querySelector('canvas');
+    if(canvas)
+      canvasContainer.removeChild(canvas);
+
+    const container = document.getElementById('container')! as HTMLDivElement;
+    const oldCanvas = container.querySelector('canvas');
+    if(oldCanvas)
+      container.removeChild(oldCanvas);
   }
 
 }

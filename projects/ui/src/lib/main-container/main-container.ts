@@ -8,6 +8,7 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
 import {DropDownMenu, DropdownOption} from '../drop-down-menu/drop-down-menu';
 import {ProjectLoader} from '@tiled-web/logic';
+import {Button} from '../button/button';
 
 @Component({
   selector: 'tiled-web-ui-main-container',
@@ -16,7 +17,8 @@ import {ProjectLoader} from '@tiled-web/logic';
     LanguageSwitcher,
     TranslatePipe,
     NgIcon,
-    DropDownMenu
+    DropDownMenu,
+    Button
   ],
   providers: [
     provideIcons({heroArrowDownCircle})
@@ -43,11 +45,15 @@ import {ProjectLoader} from '@tiled-web/logic';
                 <img src="images/github-mark.svg" class="w-8 block dark:hidden"/>
                 <img src="images/github-mark-white.svg" class="w-8 hidden dark:block"/>
               </a>
+
               <tiled-web-ui-dark-mode-toggle/>
               <tiled-web-ui-language-switcher/>
               <tiled-web-ui-drop-down-menu [title]="'Saved Projects'" [options]="dropDownOptions">
                 <p label class="text-white">{{ 'tiledWeb.savedProjects' |translate }}</p>
               </tiled-web-ui-drop-down-menu>
+              <tiled-web-ui-button (click)="closeAndDeleteProject()" [styling]="'bg-red-700 hover:bg-red-800  dark:bg-red-600 dark:hover:bg-red-700'">
+                <p label class="text-white">{{ 'tiledWeb.closeProject' |translate }}</p>
+              </tiled-web-ui-button>
             </div>
             <!--div class="progress-container w-full absolute bottom-0 h-2 z-[999]">
               <div class="progress-bar bg-gray-800" id="myBar"></div>
@@ -114,6 +120,7 @@ import {ProjectLoader} from '@tiled-web/logic';
 export class MainContainer implements OnInit {
   rootStore = inject(RootStore);
   projectUpload = output<File>();
+  projectClosed = output<void>();
   projectLoader = inject(ProjectLoader);
 
   dropDownOptions: DropdownOption[] = [
@@ -142,6 +149,12 @@ export class MainContainer implements OnInit {
       })
     }
     console.log(this.dropDownOptions);
+  }
+
+  async closeAndDeleteProject() {
+    return this.projectLoader.deleteBinary('active').then(() => {
+      this.projectClosed.emit();
+    })
   }
 
 
