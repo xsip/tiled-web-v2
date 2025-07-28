@@ -88,6 +88,84 @@
           }
         }
       }
+    },
+    "ui": {
+      "projectType": "library",
+      "root": "projects/ui",
+      "sourceRoot": "projects/ui/src",
+      "prefix": "tiled-web-ui",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/ui/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "animations": {
+      "projectType": "library",
+      "root": "projects/animations",
+      "sourceRoot": "projects/animations/src",
+      "prefix": "tiled-web-animations",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/animations/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/animations/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/animations/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "stores": {
+      "projectType": "library",
+      "root": "projects/stores",
+      "sourceRoot": "projects/stores/src",
+      "prefix": "tiled-web-stores",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/stores/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/stores/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/stores/tsconfig.spec.json"
+          }
+        }
+      }
     }
   }
 }

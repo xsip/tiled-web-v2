@@ -1,16 +1,19 @@
 import {Component, inject, signal} from '@angular/core';
-import {RootStore} from './stores/root.store';
+import {RootStore} from '@tiled-web/stores';
 import {TranslatePipe} from '@ngx-translate/core';
+import {LanguageSwitcher, MainContainer} from '@tiled-web/ui';
 
 @Component({
-  selector: 'tiled-webroot',
+  selector: 'tiled-web-root',
   imports: [
-    TranslatePipe
+    TranslatePipe,
+    LanguageSwitcher,
+    MainContainer
   ],
   template: `
-    <h1>Welcome to {{ title() |translate }}!</h1>
-
-
+    <tiled-web-ui-main-container>
+      <h1 class="text-black bg-red-500">Welcome to {{ title() |translate }}!</h1>
+    </tiled-web-ui-main-container>
   `,
   styles: [],
 })

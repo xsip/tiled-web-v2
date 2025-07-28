@@ -13,7 +13,21 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@tiled-web/ui": [
+        "./dist/ui",
+        "./projects/ui/src/public-api.ts",
+      ],
+      "@tiled-web/animations": [
+        "./dist/animations",
+        "./projects/animations/src/public-api.ts"
+      ],
+      "@tiled-web/stores": [
+        "./dist/stores",
+        "./projects/stores/src/public-api.ts"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -29,6 +43,24 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/ui/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/animations/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/animations/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/stores/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/stores/tsconfig.spec.json"
     }
   ]
 }
