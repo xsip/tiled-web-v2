@@ -5,6 +5,7 @@
     "english": "English"
   },
   "tiledWeb": {
-    "upload": "Upload Tiled Map File"
+    "upload": "Upload Tiled Map File",
+    "savedProjects": "Saved Projects"
   }
 }

@@ -1,4 +1,4 @@
-import {Component, inject, output} from '@angular/core';
+import {Component, inject, OnInit, output} from '@angular/core';
 import {bounceInOut, fadeInOut} from '@tiled-web/animations';
 import {DarkModeToggle} from '../dark-mode-toggle/dark-mode-toggle';
 import {LanguageSwitcher} from '../language-switcher/language-switcher';
@@ -6,6 +6,8 @@ import {RootStore} from '@tiled-web/stores';
 import {TranslatePipe} from '@ngx-translate/core';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
+import {DropDownMenu, DropdownOption} from '../drop-down-menu/drop-down-menu';
+import {ProjectLoader} from '@tiled-web/logic';
 
 @Component({
   selector: 'tiled-web-ui-main-container',
@@ -13,7 +15,8 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
     DarkModeToggle,
     LanguageSwitcher,
     TranslatePipe,
-    NgIcon
+    NgIcon,
+    DropDownMenu
   ],
   providers: [
     provideIcons({heroArrowDownCircle})
@@ -37,6 +40,9 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
             <div class="flex gap-2 items-center mr-5">
               <tiled-web-ui-dark-mode-toggle/>
               <tiled-web-ui-language-switcher/>
+              <tiled-web-ui-drop-down-menu [title]="'Saved Projects'" [options]="dropDownOptions">
+                <p label class="text-white">{{'tiledWeb.savedProjects' |translate}}</p>
+              </tiled-web-ui-drop-down-menu>
             </div>
             <!--div class="progress-container w-full absolute bottom-0 h-2 z-[999]">
               <div class="progress-bar bg-gray-800" id="myBar"></div>
@@ -100,11 +106,39 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
     bounceInOut()
   ]
 })
-export class MainContainer {
+export class MainContainer implements OnInit {
   rootStore = inject(RootStore);
   projectUpload = output<File>();
+  projectLoader = inject(ProjectLoader);
+
+  dropDownOptions: DropdownOption[] = [
+
+  ]
 
   uploadMap(event: any): void {
     this.projectUpload.emit(event.target.files.item(0));
   }
+
+  async  ngOnInit() {
+    const binaries = await this.projectLoader.listAllBinaries();
+    for(const binary of binaries) {
+      this.dropDownOptions.push({
+        text: binary.key,
+        display(){
+          return true;
+        },
+        click() {
+
+        },
+        value: binary.key,
+        additionalItemClass() {
+          return ''
+        }
+      })
+    }
+    console.log(this.dropDownOptions);
+  }
+
+
+
 }

@@ -52,7 +52,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
   ],
   template: `
     <tiled-web-ui-main-container (projectUpload)="projectUpload($event)">
-      {{ jsonFilesOnly | json}}
+      {{ jsonFilesOnly | json }}
       <div body class="h-full w-full flex ">
         @if (jsonFilesOnly.length && !tileData) {
           <div class="flex flex-col">
@@ -64,9 +64,11 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
           </div>
         }
         @if (tileData) {
-          <div class="h-full flex flex-col gap-2 w-[250px]">
+          <div class="h-full flex flex-col gap-0.5 w-[250px]">
             @for (layer of tileData.layers; track layer.name; let i = $index) {
-              <p (click)="tileData.layers[i].visible = !tileData.layers[i].visible" class="pl-5">{{ layer.name }}</p>
+              <div class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
+                <p (click)="tileData.layers[i].visible = !tileData.layers[i].visible" class="pl-5">{{ layer.name }}</p>
+              </div>
             }
           </div>
         }
@@ -78,7 +80,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
               class="w-full flex h-16 items-center flex-row overflow-x-scroll overflow-y-hidden no-scrollbar gap-0.5">
               @for (tileset of tileData.tilesets; track tileset.data.name) {
                 <div (click)="selectTileset(tileset)"
-                     class="cursor-pointer px-5  bg-slate-900 text-gray-300 h-full  flex items-center flex-grow-0 flex-shrink-0">
+                     class="cursor-pointer px-5  bg-primary-2 text-secondary text-gray-300 h-full  flex items-center flex-grow-0 flex-shrink-0">
                   <p>{{ tileset.data.name }}</p>
                 </div>
               }

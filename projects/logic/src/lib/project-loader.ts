@@ -29,6 +29,24 @@ export class ProjectLoader {
     return this.dbInstance
   }
 
+  async listAllBinaries(): Promise<{ key: string;}[]> {
+    const tx = this.dbInstance.transaction('projects', 'readonly');
+    const store = tx.objectStore('projects');
+
+    const entries: { key: string;}[] = [];
+
+    // Use a cursor to iterate over all entries
+    let cursor = await store.openCursor();
+    while (cursor) {
+      entries.push({
+        key: cursor.key as string,
+      });
+      cursor = await cursor.continue();
+    }
+
+    return entries;
+  }
+
   async setBinary(key: string, value: Uint8Array): Promise<void> {
     await this.dbInstance.put('projects', value, key);
   }
