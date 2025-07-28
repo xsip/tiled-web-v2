@@ -3,5 +3,8 @@
   "languageSwitcher": {
     "german": "German",
     "english": "English"
+  },
+  "tiledWeb": {
+    "upload": "Upload Tiled Map File"
   }
 }

@@ -1,4 +1,4 @@
-import {TileLayerExtended, TileMapData, TilesetExtended, TmxJson,} from '../map/model/tiled';
+import {TileLayerExtended, TileMapData, TilesetExtended, TmxJson,} from '@tiled-web/models';
 import Vector from 'vector2js';
 import {JSZipObject} from 'jszip';
 

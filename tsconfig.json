@@ -30,6 +30,14 @@
       "@tiled-web/logic": [
         "./dist/logic",
         "./projects/logic/src/public-api.ts"
+      ],
+      "@tiled-web/models": [
+        "./dist/models",
+        "./projects/models/src/public-api.ts"
+      ],
+      "@tiled-web/controls": [
+        "./dist/controls",
+        "./projects/controls/src/public-api.ts"
 
       ]
     }
@@ -72,6 +80,18 @@
     },
     {
       "path": "./projects/logic/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/models/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/models/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/controls/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/controls/tsconfig.spec.json"
     }
   ]
 }

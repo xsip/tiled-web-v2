@@ -1,8 +1,8 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, output} from '@angular/core';
 import {bounceInOut, fadeInOut} from '@tiled-web/animations';
 import {DarkModeToggle} from '../dark-mode-toggle/dark-mode-toggle';
 import {LanguageSwitcher} from '../language-switcher/language-switcher';
-import { RootStore } from '@tiled-web/stores';
+import {RootStore} from '@tiled-web/stores';
 import {TranslatePipe} from '@ngx-translate/core';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
@@ -20,7 +20,6 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
   ],
   template: `
     <div class="w-screen  relative h-screen background-container">
-      <div class="absolute top-0 left-0 w-full h-full backdrop-blur-[10px] bg-black/20 z-[1]"></div>
       <div id="fullContainer" #element
            class="fullContainer z-[2] overflow-y-scroll w-full   mx-auto drop-shadow-2xl overflow-x-hidden no-scrollbar h-screen relative">
         <div
@@ -29,6 +28,11 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
             <div class="flex gap-5 items-center">
               <a><img class="ml-2   rounded-md md:w-10 md:h-10 w-8 h-8"
                       src="images/xsip.png"/></a>
+            </div>
+            <div class="bg-primary-2 p-5 drop-shadow-md dark:drop-shadow-transparent drop-shadow-secondary/10 cursor-pointer text-secondary rounded-md hover:scale-105 transition-all ease-in-out duration-500">
+
+              <input #fileInput class="hidden" type="file" (change)="uploadMap($event)"/>
+              <p (click)="fileInput.click()">{{'tiledWeb.upload' |translate}}</p>
             </div>
             <div class="flex gap-2 items-center mr-5">
               <tiled-web-ui-dark-mode-toggle/>
@@ -86,7 +90,11 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
       </div>
     }
   `,
-  styles: ``,
+  styles: [`
+    .initial {
+      display: initial;
+    }
+  `],
   animations: [
     fadeInOut('150ms', '150ms'),
     bounceInOut()
@@ -94,5 +102,9 @@ import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
 })
 export class MainContainer {
   rootStore = inject(RootStore);
+  projectUpload = output<File>();
 
+  uploadMap(event: any): void {
+    this.projectUpload.emit(event.target.files.item(0));
+  }
 }

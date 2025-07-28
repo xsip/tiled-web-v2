@@ -3,5 +3,8 @@
   "languageSwitcher": {
     "german": "Deutsch",
     "english": "Englisch"
+  },
+  "tiledWeb": {
+    "upload": "Tiled Map Hochladen"
   }
 }

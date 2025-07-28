@@ -192,6 +192,58 @@
           }
         }
       }
+    },
+    "models": {
+      "projectType": "library",
+      "root": "projects/models",
+      "sourceRoot": "projects/models/src",
+      "prefix": "tiled-models",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/models/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/models/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/models/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "controls": {
+      "projectType": "library",
+      "root": "projects/controls",
+      "sourceRoot": "projects/controls/src",
+      "prefix": "tiled-web-controls",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/controls/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/controls/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/controls/tsconfig.spec.json"
+          }
+        }
+      }
     }
   }
 }
