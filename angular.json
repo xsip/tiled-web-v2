@@ -166,6 +166,32 @@
           }
         }
       }
+    },
+    "logic": {
+      "projectType": "library",
+      "root": "projects/logic",
+      "sourceRoot": "projects/logic/src",
+      "prefix": "tiled-logic",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/logic/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/logic/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/logic/tsconfig.spec.json"
+          }
+        }
+      }
     }
   }
 }

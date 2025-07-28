@@ -26,6 +26,11 @@
       "@tiled-web/stores": [
         "./dist/stores",
         "./projects/stores/src/public-api.ts"
+      ],
+      "@tiled-web/logic": [
+        "./dist/logic",
+        "./projects/logic/src/public-api.ts"
+
       ]
     }
   },
@@ -61,6 +66,12 @@
     },
     {
       "path": "./projects/stores/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/logic/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/logic/tsconfig.spec.json"
     }
   ]
 }
