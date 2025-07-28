@@ -32,16 +32,21 @@ import {ProjectLoader} from '@tiled-web/logic';
               <a><img class="ml-2   rounded-md md:w-10 md:h-10 w-8 h-8"
                       src="images/xsip.png"/></a>
             </div>
-            <div class="bg-primary-2 p-5 drop-shadow-md dark:drop-shadow-transparent drop-shadow-secondary/10 cursor-pointer text-secondary rounded-md hover:scale-105 transition-all ease-in-out duration-500">
+            <div
+              class="bg-primary-2 p-5 drop-shadow-md dark:drop-shadow-transparent drop-shadow-secondary/10 cursor-pointer text-secondary rounded-md hover:scale-105 transition-all ease-in-out duration-500">
 
               <input #fileInput class="hidden" type="file" (change)="uploadMap($event)"/>
-              <p (click)="fileInput.click()">{{'tiledWeb.upload' |translate}}</p>
+              <p (click)="fileInput.click()">{{ 'tiledWeb.upload' |translate }}</p>
             </div>
             <div class="flex gap-2 items-center mr-5">
+              <a href="https://github.com/xsip/tiled-web-v2" target="_blank" class="transition-all ease-in duration-200 cursor-pointer hover:scale-105">
+                <img src="images/github-mark.svg" class="w-8 block dark:hidden"/>
+                <img src="images/github-mark-white.svg" class="w-8 hidden dark:block"/>
+              </a>
               <tiled-web-ui-dark-mode-toggle/>
               <tiled-web-ui-language-switcher/>
               <tiled-web-ui-drop-down-menu [title]="'Saved Projects'" [options]="dropDownOptions">
-                <p label class="text-white">{{'tiledWeb.savedProjects' |translate}}</p>
+                <p label class="text-white">{{ 'tiledWeb.savedProjects' |translate }}</p>
               </tiled-web-ui-drop-down-menu>
             </div>
             <!--div class="progress-container w-full absolute bottom-0 h-2 z-[999]">
