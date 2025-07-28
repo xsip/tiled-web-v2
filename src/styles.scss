@@ -1,1 +1,100 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@import "devicon/devicon-base.css";
+@import "devicon/devicon.min.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@custom-variant dark (&:where(.dark, .dark *));
+
+.tooltip {
+  @apply invisible absolute;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+}
+
+:root {
+  --color-primary: rgba(235, 235, 235, 1);
+  --color-primary-2: white;
+  --color-secondary: rgba(35, 35, 35, 1);
+}
+
+.dark {
+  --color-primary: rgba(35, 35, 35, 1);
+  --color-primary-2: rgba(55,55,55,1);
+  --color-secondary: rgba(235, 235, 235, 1);
+}
+
+
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-2: var(--color-primary-2);
+  --color-secondary: var(--color-secondary);
+
+
+  --animate-marquee: marquee 250s linear infinite;
+  --animate-marquee2: marquee2 250s linear infinite;
+  --animate-marquee-slow: marquee 2500s linear infinite;
+  --animate-marquee-slow2: marquee2 2500s linear infinite;
+
+  @keyframes marquee {
+    0%,
+    100% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes marquee2 {
+    0%,
+    100% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+}
+
+body {
+  @apply dark:bg-slate-500 bg-white;
+}
+
+@utility animation-pause {
+  animation-play-state: paused!important;
+}
+
+@layer utilities {
+
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom transition */
+@keyframes rotate-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes rotate-in {
+  from {
+    transform: translateY(0%);
+  }
+}
+::view-transition-new(navigate) {
+  animation-duration: 200ms;
+  animation-name: -ua-view-transition-fade-in, rotate-in;
+}
+::view-transition-old(navigate) {
+  animation-name: -ua-view-transition-fade-out, rotate-out;
+}

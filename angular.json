@@ -14,7 +14,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "tw",
+      "prefix": "tiled-web",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
