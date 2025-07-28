@@ -1,6 +1,6 @@
 import {
   ApplicationConfig,
-  inject,
+  inject, provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection
 } from '@angular/core';
@@ -10,6 +10,7 @@ import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {HttpClient, provideHttpClient, withFetch} from '@angular/common/http';
 import {RootStore} from '@tiled-web/stores';
 import {setLangHelper} from '@tiled-web/ui';
+import {ProjectLoader} from '@tiled-web/logic';
 
 export const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) => {
   return new TranslateHttpLoader(http, './i18n/', '.json');
@@ -40,5 +41,10 @@ export const appConfig: ApplicationConfig = {
       },
       deps: [RootStore]
     },
+
+    provideAppInitializer( async () => {
+      const dbService = inject(ProjectLoader)
+      return await dbService.initDB();
+    })
   ]
 };

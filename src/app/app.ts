@@ -6,7 +6,7 @@ import * as jszip from 'jszip';
 import {JSZipObject} from 'jszip';
 import Vector from 'vector2js';
 import {TilesetExtended, TmxJson} from '@tiled-web/models';
-import {CollectedMapData, TiledMapParser} from '@tiled-web/logic';
+import {CollectedMapData, ProjectLoader, TiledMapParser} from '@tiled-web/logic';
 import {HttpClient} from '@angular/common/http';
 import {KeyboardHandlerService} from '@tiled-web/controls';
 import {JsonPipe} from '@angular/common';
@@ -99,6 +99,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
 export class App implements OnInit {
   rootStore = inject(RootStore);
 
+  loadedFromIndexedDb = false;
   zipFiles: JSZipObject[] = [];
   mapFile?: TmxJson;
   tileData?: CollectedMapData;
@@ -107,13 +108,34 @@ export class App implements OnInit {
 
   cdr = inject(ChangeDetectorRef);
 
+  projectLoader = inject(ProjectLoader);
 
-  ngOnInit() {
+
+  async ngOnInit() {
+    const activeProject = await this.projectLoader.getBinary('active');
+    if(activeProject) {
+      this.cdr.markForCheck();
+      this.loadedFromIndexedDb = true;
+      this.zipBlob = new Blob([activeProject], { type: 'application/octet-stream' });
+      const res2 = await jszip.loadAsync(this.zipBlob, {});
+      this.zipFiles = Object.keys(res2.files).map(key => {
+        return res2.files[key]
+      });
+      await this.selectFile(this.zipFiles.find(f => f.name.includes('map1.json'))!);
+      this.selectTileset(this.tileData?.tilesets[0]);
+
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.httpClient.get('demo/game-map-1.zip', {
       responseType: 'blob'
     }).subscribe(async (res) => {
       this.cdr.markForCheck();
       this.zipBlob = res;
+      if(!activeProject)
+        await this.projectLoader.setBinary('active',await this.blobToUint8Array(res));
+
       const res2 = await jszip.loadAsync(this.zipBlob, {});
       this.zipFiles = Object.keys(res2.files).map(key => {
         return res2.files[key]
@@ -124,6 +146,18 @@ export class App implements OnInit {
       this.cdr.detectChanges();
 
     })
+  }
+
+  private blobToUint8Array(blob: Blob): Promise<Uint8Array> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        resolve(new Uint8Array(arrayBuffer));
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(blob);
+    });
   }
 
   async projectUpload(file: File) {
