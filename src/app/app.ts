@@ -10,6 +10,8 @@ import {CollectedMapData, ProjectLoader, TiledMapParser} from '@tiled-web/logic'
 import {HttpClient} from '@angular/common/http';
 import {KeyboardHandlerService} from '@tiled-web/controls';
 import {JsonPipe} from '@angular/common';
+import {NgIcon, provideIcons} from '@ng-icons/core';
+import {heroEye} from '@ng-icons/heroicons/outline';
 
 
 
@@ -48,7 +50,11 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
   selector: 'tiled-web-root',
   imports: [
     MainContainer,
-    JsonPipe
+    JsonPipe,
+    NgIcon
+  ],
+  providers: [
+    provideIcons({heroEye})
   ],
   template: `
     <tiled-web-ui-main-container
@@ -60,7 +66,8 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
         @if (jsonFilesOnly.length && !tileData) {
           <div class="flex flex-col">
             @for (file of jsonFilesOnly; track file.name) {
-              <div class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
+              <div
+                class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
                 <p (click)="selectFile(file)" class="pl-5">{{ file.name }}</p>
               </div>
             }
@@ -69,8 +76,13 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
         @if (tileData) {
           <div class="h-full flex flex-col gap-0.5 w-[250px]">
             @for (layer of tileData.layers; track layer.name; let i = $index) {
-              <div class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
-                <p (click)="tileData.layers[i].visible = !tileData.layers[i].visible" class="pl-5">{{ layer.name }}</p>
+              <div (click)="tileData.layers[i].visible = !tileData.layers[i].visible"
+                   class="cursor-pointer flex justify-between items-center px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
+                <p class="{{tileData.layers[i].visible ? '' : 'line-through'}}">{{ layer.name }}</p>
+
+                <div class="w-12 {{tileData.layers[i].visible ? 'text-green-500' : 'text-red-500'}}">
+                  <ng-icon [name]="'heroEye'"/>
+                </div>
               </div>
             }
           </div>
@@ -169,6 +181,7 @@ export class App implements OnInit {
 
   async projectUpload(file: File) {
     this.cdr.markForCheck();
+    await this.projectClosed();
     const res = await jszip.loadAsync(file, {});
     this.zipFiles = Object.keys(res.files).map(key => {
       return res.files[key]

@@ -54,6 +54,9 @@ import {Button} from '../button/button';
               <tiled-web-ui-button (click)="closeAndDeleteProject()" [styling]="'bg-red-700 hover:bg-red-800  dark:bg-red-600 dark:hover:bg-red-700'">
                 <p label class="text-white">{{ 'tiledWeb.closeProject' |translate }}</p>
               </tiled-web-ui-button>
+              <tiled-web-ui-button (click)="_saveProjectAs()" [styling]="'bg-green-700 hover:bg-green-800  dark:bg-green-600 dark:hover:bg-green-700'">
+                <p label class="text-white">{{ 'tiledWeb.saveProject' |translate }}</p>
+              </tiled-web-ui-button>
             </div>
             <!--div class="progress-container w-full absolute bottom-0 h-2 z-[999]">
               <div class="progress-bar bg-gray-800" id="myBar"></div>
@@ -121,6 +124,7 @@ export class MainContainer implements OnInit {
   rootStore = inject(RootStore);
   projectUpload = output<File>();
   projectClosed = output<void>();
+  saveProjectAs = output<void>();
   projectLoader = inject(ProjectLoader);
 
   dropDownOptions: DropdownOption[] = [
@@ -155,6 +159,10 @@ export class MainContainer implements OnInit {
     return this.projectLoader.deleteBinary('active').then(() => {
       this.projectClosed.emit();
     })
+  }
+
+  _saveProjectAs() {
+    this.saveProjectAs.emit();
   }
 
 
