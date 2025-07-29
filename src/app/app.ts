@@ -60,8 +60,8 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
         @if (jsonFilesOnly.length && !tileData) {
           <div class="flex flex-col">
             @for (file of jsonFilesOnly; track file.name) {
-              <div (click)="selectFile(file)" class="cursor-pointer">
-                {{ file.name }}
+              <div class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
+                <p (click)="selectFile(file)" class="pl-5">{{ file.name }}</p>
               </div>
             }
           </div>
@@ -117,7 +117,7 @@ export class App implements OnInit {
 
 
   async ngOnInit() {
-    const activeProject = await this.projectLoader.getBinary('active');
+    const activeProject = undefined; // await this.projectLoader.getBinary('active');
     if(activeProject) {
       this.cdr.markForCheck();
       this.loadedFromIndexedDb = true;
@@ -133,19 +133,19 @@ export class App implements OnInit {
       return;
     }
 
-    this.httpClient.get('demo/game-map-1.zip', {
+    this.httpClient.get('demo/test.zip', {
       responseType: 'blob'
     }).subscribe(async (res) => {
       this.cdr.markForCheck();
       this.zipBlob = res;
-      if(!activeProject)
-        await this.projectLoader.setBinary('active',await this.blobToUint8Array(res));
+      // if(!activeProject)
+        // await this.projectLoader.setBinary('active',await this.blobToUint8Array(res));
 
       const res2 = await jszip.loadAsync(this.zipBlob, {});
       this.zipFiles = Object.keys(res2.files).map(key => {
         return res2.files[key]
       });
-      await this.selectFile(this.zipFiles.find(f => f.name.includes('map1.json'))!);
+      // await this.selectFile(this.zipFiles.find(f => f.name.includes('map1.json'))!);
       this.selectTileset(this.tileData?.tilesets[0]);
 
       this.cdr.detectChanges();
