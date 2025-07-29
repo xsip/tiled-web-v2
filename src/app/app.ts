@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
-import {RootStore} from '@tiled-web/stores';
+import {ProjectStore, RootStore} from '@tiled-web/stores';
 import {MainContainer} from '@tiled-web/ui';
 
 import * as jszip from 'jszip';
@@ -114,10 +114,12 @@ export class App implements OnInit {
   cdr = inject(ChangeDetectorRef);
 
   projectLoader = inject(ProjectLoader);
+  projectStore = inject(ProjectStore);
 
 
   async ngOnInit() {
-    const activeProject = undefined; // await this.projectLoader.getBinary('active');
+    await this.projectStore.init();
+    const activeProject = await this.projectLoader.getBinary('active');
     if(activeProject) {
       this.cdr.markForCheck();
       this.loadedFromIndexedDb = true;
@@ -126,20 +128,20 @@ export class App implements OnInit {
       this.zipFiles = Object.keys(res2.files).map(key => {
         return res2.files[key]
       });
-      await this.selectFile(this.zipFiles.find(f => f.name.includes('map1.json'))!);
-      this.selectTileset(this.tileData?.tilesets[0]);
+      // await this.selectFile(this.zipFiles.find(f => f.name.includes('map1.json'))!);
+      // this.selectTileset(this.tileData?.tilesets[0]);
 
       this.cdr.detectChanges();
       return;
     }
 
-    this.httpClient.get('demo/test.zip', {
+    /*this.httpClient.get('demo/game-map-1.zip', {
       responseType: 'blob'
     }).subscribe(async (res) => {
       this.cdr.markForCheck();
       this.zipBlob = res;
-      // if(!activeProject)
-        // await this.projectLoader.setBinary('active',await this.blobToUint8Array(res));
+      if(!activeProject)
+        await this.projectLoader.setBinary('active',await this.blobToUint8Array(res));
 
       const res2 = await jszip.loadAsync(this.zipBlob, {});
       this.zipFiles = Object.keys(res2.files).map(key => {
@@ -150,7 +152,7 @@ export class App implements OnInit {
 
       this.cdr.detectChanges();
 
-    })
+    })*/
   }
 
   private blobToUint8Array(blob: Blob): Promise<Uint8Array> {
@@ -171,6 +173,7 @@ export class App implements OnInit {
     this.zipFiles = Object.keys(res.files).map(key => {
       return res.files[key]
     });
+    await this.projectStore.updateZipFileBlob(file);
     this.cdr.detectChanges();
   }
 
@@ -224,7 +227,6 @@ export class App implements OnInit {
   }
 
   async selectFile(file: JSZipObject) {
-
     this.cdr.markForCheck();
     const res = await file.async('string');
 
@@ -277,15 +279,22 @@ export class App implements OnInit {
   }
 
   projectClosed() {
+    this.cdr.markForCheck();
     const canvasContainer = document.getElementById('tilesetCanvas')! as HTMLDivElement;
-    const canvas = canvasContainer.querySelector('canvas');
+    const canvas = canvasContainer?.querySelector('canvas');
     if(canvas)
       canvasContainer.removeChild(canvas);
 
     const container = document.getElementById('container')! as HTMLDivElement;
-    const oldCanvas = container.querySelector('canvas');
+    const oldCanvas = container?.querySelector('canvas');
     if(oldCanvas)
       container.removeChild(oldCanvas);
+
+    this.zipBlob = undefined;
+    this.zipFiles = [];
+    this.mapFile = undefined;
+    this.tileData = undefined;
+    this.cdr.detectChanges();
   }
 
 }

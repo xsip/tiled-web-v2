@@ -8,7 +8,7 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
 import {provideTranslateService, TranslateLoader, TranslateService} from "@ngx-translate/core";
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {HttpClient, provideHttpClient, withFetch} from '@angular/common/http';
-import {RootStore} from '@tiled-web/stores';
+import {ProjectStore, RootStore} from '@tiled-web/stores';
 import {setLangHelper} from '@tiled-web/ui';
 import {ProjectLoader} from '@tiled-web/logic';
 
@@ -44,7 +44,8 @@ export const appConfig: ApplicationConfig = {
 
     provideAppInitializer( async () => {
       const dbService = inject(ProjectLoader)
-      return await dbService.initDB();
+      await dbService.initDB();
+
     })
   ]
 };
