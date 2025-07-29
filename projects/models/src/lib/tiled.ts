@@ -1,5 +1,7 @@
 // custom
 
+import {TilesetV2} from './models-v2';
+
 export type TileMapData = {
   x: number
   y: number
@@ -62,7 +64,7 @@ export type ObjectLayer = {
 export type TileLayer = {
   type: 'tilelayer';
   chunks?: Chunk[];
-  data?: number[];
+  data?: number[] | string;
   encoding?: 'csv' | 'base64';
   compression?: 'zlib' | 'gzip';
 } & BaseLayer
@@ -93,7 +95,7 @@ export type TmxJson = {
   renderorder: string;
   tiledversion: string;
   tileheight: number;
-  tilesets: Tileset[];
+  tilesets: (Tileset | TilesetV2)[];
   tilewidth: number;
   type: string;
   version: number;

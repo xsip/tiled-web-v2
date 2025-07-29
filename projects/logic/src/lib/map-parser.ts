@@ -1,4 +1,13 @@
-import {TileLayerExtended, TileMapData, TilesetExtended, TmxJson,} from '@tiled-web/models';
+import {
+  TiledMap,
+  TiledMapV2,
+  TileLayerExtended,
+  TileMapData,
+  Tileset,
+  TilesetExtended, TilesetV2,
+  TmxJson,
+  TsxJson,
+} from '@tiled-web/models';
 import Vector from 'vector2js';
 import {JSZipObject} from 'jszip';
 
@@ -23,25 +32,12 @@ export class TiledMapParser {
     let tilesets: TilesetExtended[] = [];
 
     for (const tilemap of tiledMap.tilesets) {
-      const fixedName = tilemap.source.replace('.tsx', '.json');
-      const arrayEntryName =
-        fixedName.split('/')[tilemap.source.split('/').length - 1];
-      // const tileMapFetch = await fetch(tmJsonBaseUrl + arrayEntryName);
-      // const tileMapJson = (await tileMapFetch.json()) as TsxJson;
-      const tileMapJson = JSON.parse(await files.find(f => f.name.includes(arrayEntryName))!.async('string'))
-      console.log(tileMapJson);
-      const tileMapImage = new Image();
-      const blobImage = await files.find(f => f.name.includes(tileMapJson.image.split('/')[tileMapJson.image.split('/').length - 1]))!.async('blob');
-      tileMapImage.src = await blobToBase64(blobImage);
-      await new Promise(res => {
-        tileMapImage.onload = res;
-      });
-      tilesets.push({
-        ...tilemap,
-        element: tileMapImage,
-        data: tileMapJson,
-        ids: [],
-      });
+
+      if('source' in tilemap) {
+        tilesets.push(await TiledMapParser.mapTileSetWithSource(tilemap, files));
+      } else if ('name' in tilemap) {
+        tilesets.push(await TiledMapParser.mapTileSetWithoutSource(tilemap, files));
+      }
     }
     const layersCpy = [...tiledMap.layers.map(layer => {
       return {
@@ -73,6 +69,91 @@ export class TiledMapParser {
   }
 
 
+  private static async mapTileSetWithSource(tilemap: Tileset,files: JSZipObject[]) {
+    const fixedName = (tilemap.source).replace('.tsx', '.json');
+    const arrayEntryName =
+      fixedName.split('/')[tilemap.source.split('/').length - 1];
+    // const tileMapFetch = await fetch(tmJsonBaseUrl + arrayEntryName);
+    // const tileMapJson = (await tileMapFetch.json()) as TsxJson;
+    const tileMapJson = JSON.parse(await files.find(f => f.name.includes(arrayEntryName))!.async('string'))
+    console.log(tileMapJson);
+    const tileMapImage = new Image();
+    const blobImage = await files.find(f => f.name.includes(tileMapJson.image.split('/')[tileMapJson.image.split('/').length - 1]))!.async('blob');
+    tileMapImage.src = await blobToBase64(blobImage);
+    await new Promise(res => {
+      tileMapImage.onload = res;
+    });
+    return {
+      ...tilemap,
+      element: tileMapImage,
+      data: tileMapJson,
+      ids: [],
+    }
+  }
+
+
+  private static async mapTileSetWithoutSource(_tilemap: TilesetV2,files: JSZipObject[]) {
+    const tileMapJson = _tilemap as unknown as TsxJson;
+    const tileMapImage = new Image();
+    const blobImage = await files.find(f => f.name.includes(tileMapJson.image.split('/')[tileMapJson.image.split('/').length - 1]))!.async('blob');
+    tileMapImage.src = await blobToBase64(blobImage);
+    await new Promise(res => {
+      tileMapImage.onload = res;
+    });
+    return {
+      ..._tilemap,
+      source: tileMapJson.image,
+      element: tileMapImage,
+      data: tileMapJson,
+      ids: [],
+    }
+  }
+
+  private static decodeTiledBase64Array(base64Chunks: string[]) {
+    // Join all strings into a single base64 string
+    const base64 = base64Chunks.join('');
+
+    // Decode base64 to binary string
+    const binary = atob(base64);
+
+    // Convert binary string to byte array
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    // Convert every 4 bytes into a 32-bit little-endian integer (GID)
+    const gids = [];
+    for (let i = 0; i < bytes.length; i += 4) {
+      const gid =
+        bytes[i] |
+        (bytes[i + 1] << 8) |
+        (bytes[i + 2] << 16) |
+        (bytes[i + 3] << 24);
+      gids.push(gid);
+    }
+
+    return gids;
+  }
+
+  private static decodeBase64Layer(base64: string) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    const gids: number[] = [];
+    for (let i = 0; i < bytes.length; i += 4) {
+      const gid = bytes[i] | (bytes[i + 1] << 8) | (bytes[i + 2] << 16) | (bytes[i + 3] << 24);
+      gids.push(gid);
+    }
+
+    return gids;
+  }
+
+
   private static resolveTileIds(
     tiledMap: TmxJson,
     layerName: string = 'cave',
@@ -90,8 +171,10 @@ export class TiledMapParser {
     }
     const tiledData: TileMapData[] = [];
     const mappedLayer: number[][] = [];
+    if(layer.encoding === 'base64' && typeof layer.data === 'string')
+      layer.data = TiledMapParser.decodeBase64Layer(layer.data);
     for (let i = 0; i < layer.data!.length; i += layer.width!) {
-      const row = layer.data!.slice(i, layer.width! + i);
+      const row = (layer.data as number[])!.slice(i, layer.width! + i);
       mappedLayer.push(row);
     }
     mappedLayer.forEach((row) => {
@@ -134,7 +217,7 @@ export class TiledMapParser {
 
       const mappedLayer: number[][] = [];
       for (let i = 0; i < layer.data!.length; i += layer.width!) {
-        const row = layer.data!.slice(i, layer.width! + i);
+        const row = (layer.data as number[])!.slice(i, layer.width! + i);
         mappedLayer.push(row);
       }
       const sprites: Record<string, HTMLImageElement> = {};
@@ -203,12 +286,18 @@ export class TiledMapParser {
         if(!layer.visible)
           continue;
         const mappedLayer: number[][] = [];
+
+        if(layer.encoding === 'base64' && typeof layer.data === 'string')
+          layer.data = TiledMapParser.decodeBase64Layer(layer.data);
+
         for (let i = 0; i < layer.data!.length; i += layer.width!) {
-          const row = layer.data!.slice(i, layer.width! + i);
+          const row = (layer.data as number[])!.slice(i, layer.width! + i);
           mappedLayer.push(row);
         }
         const sprites: Record<string, HTMLImageElement> = {};
         // GlobalGameData.globalScale = 1;
+
+
         mappedLayer.forEach((row, rowIndex) => {
           row.forEach((col, colIndex) => {
             if (col !== 0) {
