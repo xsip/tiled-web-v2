@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import {ProjectStore, RootStore} from '@tiled-web/stores';
-import {MainContainer} from '@tiled-web/ui';
+import {Dialog, MainContainer} from '@tiled-web/ui';
 
 import * as jszip from 'jszip';
 import {JSZipObject} from 'jszip';
@@ -51,7 +51,8 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
   imports: [
     MainContainer,
     JsonPipe,
-    NgIcon
+    NgIcon,
+    Dialog
   ],
   providers: [
     provideIcons({heroEye})
@@ -108,6 +109,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
             }
           </div>
         }
+        <tiled-web-ui-dialog/>
       </div>
     </tiled-web-ui-main-container>
   `,

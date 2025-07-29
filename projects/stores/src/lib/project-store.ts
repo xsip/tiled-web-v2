@@ -5,6 +5,7 @@ import {ProjectLoader} from '@tiled-web/logic';
 
 type ProjectState = {
   openZipFileBlob: Blob | undefined;
+  openZipFileUint8: Uint8Array | undefined;
 };
 
 const PROJECT_STATE = new InjectionToken<ProjectState>(
@@ -12,7 +13,8 @@ const PROJECT_STATE = new InjectionToken<ProjectState>(
   {
     factory: () => {
       const state = {
-        openZipFileBlob: undefined
+        openZipFileBlob: undefined,
+        openZipFileUint8: undefined
       }
       return state;
     }
@@ -32,7 +34,7 @@ export const ProjectStore = signalStore(
           let activeProjectBlob: Blob | undefined;
           if (activeProject)
             activeProjectBlob = new Blob([activeProject], {type: 'application/octet-stream'});
-          patchState(store, (state) => ({...state, openZipFileBlob: activeProjectBlob}))
+          patchState(store, (state) => ({...state, openZipFileBlob: activeProjectBlob, arr: activeProject}))
         },
         async updateZipFileBlob(file: File) {
           const bytes = await file.arrayBuffer();
@@ -42,7 +44,8 @@ export const ProjectStore = signalStore(
             await projectLoader.setBinary('active', arr);
             patchState(store, (state) => ({
               ...state,
-              openZipFileBlob: new Blob([arr], {type: 'application/octet-stream'})
+              openZipFileBlob: new Blob([arr], {type: 'application/octet-stream'}),
+              openZipFileUint8: arr
             }))
           }
         }

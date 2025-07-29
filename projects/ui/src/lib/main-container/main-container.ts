@@ -1,14 +1,16 @@
-import {Component, inject, OnInit, output} from '@angular/core';
+import {Component, inject, OnInit, output, TemplateRef} from '@angular/core';
 import {bounceInOut, fadeInOut} from '@tiled-web/animations';
 import {DarkModeToggle} from '../dark-mode-toggle/dark-mode-toggle';
 import {LanguageSwitcher} from '../language-switcher/language-switcher';
-import {RootStore} from '@tiled-web/stores';
+import {Dialog, DialogStore, RootStore} from '@tiled-web/stores';
 import {TranslatePipe} from '@ngx-translate/core';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
 import {DropDownMenu, DropdownOption} from '../drop-down-menu/drop-down-menu';
 import {ProjectLoader} from '@tiled-web/logic';
 import {Button} from '../button/button';
+import {Input} from '../input/input';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'tiled-web-ui-main-container',
@@ -18,7 +20,9 @@ import {Button} from '../button/button';
     TranslatePipe,
     NgIcon,
     DropDownMenu,
-    Button
+    Button,
+    Input,
+    FormsModule
   ],
   providers: [
     provideIcons({heroArrowDownCircle})
@@ -35,13 +39,15 @@ import {Button} from '../button/button';
                       src="images/xsip.png"/></a>
             </div>
             <div
-              class="bg-primary-2 p-5 drop-shadow-md dark:drop-shadow-transparent drop-shadow-secondary/10 cursor-pointer text-secondary rounded-md hover:scale-105 transition-all ease-in-out duration-500">
+              class="bg-primary-2 p-5 drop-shadow-md dark:drop-shadow-transparent drop-shadow-secondary/10  text-secondary rounded-md {{!dialogStore.uiBlockingDialogIsOpen() ? 'cursor-pointer hover:scale-105' : ''}} transition-all ease-in-out duration-500">
 
               <input #fileInput class="hidden" type="file" (change)="uploadMap($event)"/>
-              <p (click)="fileInput.click()">{{ 'tiledWeb.upload' |translate }}</p>
+              <p
+                (click)="!dialogStore.uiBlockingDialogIsOpen() && fileInput.click()">{{ 'tiledWeb.upload' |translate }}</p>
             </div>
             <div class="flex gap-2 items-center mr-5">
-              <a href="https://github.com/xsip/tiled-web-v2" target="_blank" class="transition-all ease-in duration-200 cursor-pointer hover:scale-105">
+              <a href="https://github.com/xsip/tiled-web-v2" target="_blank"
+                 class="transition-all ease-in duration-200 cursor-pointer hover:scale-105">
                 <img src="images/github-mark.svg" class="w-8 block dark:hidden"/>
                 <img src="images/github-mark-white.svg" class="w-8 hidden dark:block"/>
               </a>
@@ -51,10 +57,17 @@ import {Button} from '../button/button';
               <tiled-web-ui-drop-down-menu [title]="'Saved Projects'" [options]="dropDownOptions">
                 <p label class="text-white">{{ 'tiledWeb.savedProjects' |translate }}</p>
               </tiled-web-ui-drop-down-menu>
-              <tiled-web-ui-button (click)="closeAndDeleteProject()" [styling]="'bg-red-700 hover:bg-red-800  dark:bg-red-600 dark:hover:bg-red-700'">
+              <tiled-web-ui-button (click)="closeAndDeleteProject()"
+                                   [styling]="'bg-red-700 hover:bg-red-800  dark:bg-red-600 dark:hover:bg-red-700'">
                 <p label class="text-white">{{ 'tiledWeb.closeProject' |translate }}</p>
               </tiled-web-ui-button>
-              <tiled-web-ui-button (click)="_saveProjectAs()" [styling]="'bg-green-700 hover:bg-green-800  dark:bg-green-600 dark:hover:bg-green-700'">
+
+              <ng-template #saveAsDialogTemplate>
+                <tiled-web-ui-input [(ngModel)]="newProjectName" [title]="'Project Name'"/>
+              </ng-template>
+
+              <tiled-web-ui-button (click)="_saveProjectAs(saveAsDialogTemplate)"
+                                   [styling]="'bg-green-700 hover:bg-green-800  dark:bg-green-600 dark:hover:bg-green-700'">
                 <p label class="text-white">{{ 'tiledWeb.saveProject' |translate }}</p>
               </tiled-web-ui-button>
             </div>
@@ -108,6 +121,7 @@ import {Button} from '../button/button';
           </div>
         </div>
       </div>
+
     }
   `,
   styles: [`
@@ -121,26 +135,28 @@ import {Button} from '../button/button';
   ]
 })
 export class MainContainer implements OnInit {
+  newProjectName = '';
   rootStore = inject(RootStore);
+  dialogStore = inject(DialogStore);
   projectUpload = output<File>();
   projectClosed = output<void>();
   saveProjectAs = output<void>();
   projectLoader = inject(ProjectLoader);
 
-  dropDownOptions: DropdownOption[] = [
-
-  ]
+  dropDownOptions: DropdownOption[] = []
 
   uploadMap(event: any): void {
+    if (this.dialogStore.uiBlockingDialogIsOpen())
+      return;
     this.projectUpload.emit(event.target.files.item(0));
   }
 
-  async  ngOnInit() {
+  async ngOnInit() {
     const binaries = await this.projectLoader.listAllBinaries();
-    for(const binary of binaries) {
+    for (const binary of binaries) {
       this.dropDownOptions.push({
         text: binary.key,
-        display(){
+        display() {
           return true;
         },
         click() {
@@ -156,15 +172,32 @@ export class MainContainer implements OnInit {
   }
 
   async closeAndDeleteProject() {
+    if (this.dialogStore.uiBlockingDialogIsOpen())
+      return;
     return this.projectLoader.deleteBinary('active').then(() => {
       this.projectClosed.emit();
     })
   }
 
-  _saveProjectAs() {
+  _saveProjectAs(temp: TemplateRef<any>) {
+    if (this.dialogStore.uiBlockingDialogIsOpen())
+      return;
     this.saveProjectAs.emit();
+    this.dialogStore.showDialog({
+      title: 'tiledWeb.saveDialog.title',
+      description: 'tiledWeb.saveDialog.description',
+      action: () => {
+        console.log(this.newProjectName);
+      },
+      template: temp,
+      blocksUiInput: true
+    });
   }
 
+  closeSaveAsDialog(dialog: Dialog) {
+
+
+  }
 
 
 }

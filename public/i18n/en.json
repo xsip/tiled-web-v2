@@ -8,6 +8,10 @@
     "upload": "Open zip project",
     "savedProjects": "Saved Projects",
     "closeProject": "Close project",
-    "saveProject": "Save as"
+    "saveProject": "Save as",
+    "saveDialog": {
+      "title": "Save as",
+      "description": "Please select a project name!"
+    }
   }
 }

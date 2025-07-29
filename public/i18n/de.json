@@ -8,6 +8,10 @@
     "upload": "Zip Öffnen",
     "savedProjects": "Gespeicherte Projekte",
     "closeProject": "Projekt schließen",
-    "saveProject": "Speichern unter.."
+    "saveProject": "Speichern unter..",
+    "saveDialog": {
+      "title": "Speichern Unter",
+      "description": "Bitte geben sie den gewünschten Projekt Namen ein!"
+    }
   }
 }

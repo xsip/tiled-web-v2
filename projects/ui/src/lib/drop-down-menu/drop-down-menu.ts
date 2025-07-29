@@ -1,6 +1,7 @@
-import {Component, ElementRef, HostListener, input, viewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, inject, input, viewChild} from '@angular/core';
 import {bounceInOut, fadeInOut} from '@tiled-web/animations';
 import {TranslatePipe} from '@ngx-translate/core';
+import {DialogStore} from '@tiled-web/stores';
 
 export interface DropdownOption {
   text: string,
@@ -18,8 +19,8 @@ export interface DropdownOption {
   template: `
 
     <div #container class="relative w-full">
-      <button (click)="showMenu = !showMenu" id="dropdownDefaultButton"
-              class="text-white cursor-pointer h-8  w-full justify-between bg-blue-700 hover:bg-blue-800 focus:ring-0 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      <button (click)="!dialogStore.uiBlockingDialogIsOpen()  && (showMenu = !showMenu)" id="dropdownDefaultButton"
+              class="text-white cursor-pointer h-8  w-full justify-between {{canBeBlockedByUi() && dialogStore.uiBlockingDialogIsOpen() ? 'bg-gray-700! dark:bg-gray-800! cursor-default!' : '' }} bg-blue-700 hover:bg-blue-800 focus:ring-0 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               type="button">
         <ng-content select="[label]"/>
         @if(showArrow()) {
@@ -55,6 +56,9 @@ export interface DropdownOption {
 })
 export class DropDownMenu {
   showMenu = false;
+  dialogStore = inject(DialogStore);
+  canBeBlockedByUi = input<boolean>(true);
+
   container = viewChild<ElementRef<HTMLDivElement>>('container');
   options = input<DropdownOption[]>([])
   selectedValue = input<string>('');
