@@ -7,7 +7,7 @@ export type Dialog = {
   title: string;
   description?: string;
   template?: TemplateRef<any>;
-  action: () => void;
+  action: () => Promise<void> | void;
   isClosed?: boolean;
   id?: number;
   blocksUiInput?: boolean;
@@ -52,8 +52,8 @@ export const DialogStore = signalStore(
             dialogs: [...state.dialogs, {
               ...dialog,
               id: newDialogId,
-              action: () => {
-                dialog.action();
+              action: async () => {
+                await dialog.action();
                 patchState(store, (s) => ({
                   ...s, dialogs: s.dialogs.map(d => {
                     if (d.id === newDialogId)

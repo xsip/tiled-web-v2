@@ -2,7 +2,7 @@ import {Component, inject, OnInit, output, TemplateRef} from '@angular/core';
 import {bounceInOut, fadeInOut} from '@tiled-web/animations';
 import {DarkModeToggle} from '../dark-mode-toggle/dark-mode-toggle';
 import {LanguageSwitcher} from '../language-switcher/language-switcher';
-import {Dialog, DialogStore, RootStore} from '@tiled-web/stores';
+import {Dialog, DialogStore, ProjectStore, RootStore} from '@tiled-web/stores';
 import {TranslatePipe} from '@ngx-translate/core';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroArrowDownCircle} from '@ng-icons/heroicons/outline';
@@ -63,7 +63,7 @@ import {FormsModule} from '@angular/forms';
               </tiled-web-ui-button>
 
               <ng-template #saveAsDialogTemplate>
-                <tiled-web-ui-input [(ngModel)]="newProjectName" [title]="'Project Name'"/>
+                <tiled-web-ui-input class="w-1/2 block" [(ngModel)]="newProjectName" [title]="'Project Name'"/>
               </ng-template>
 
               <tiled-web-ui-button (click)="_saveProjectAs(saveAsDialogTemplate)"
@@ -138,6 +138,7 @@ export class MainContainer implements OnInit {
   newProjectName = '';
   rootStore = inject(RootStore);
   dialogStore = inject(DialogStore);
+  projectStore = inject(ProjectStore);
   projectUpload = output<File>();
   projectClosed = output<void>();
   saveProjectAs = output<void>();
@@ -152,6 +153,11 @@ export class MainContainer implements OnInit {
   }
 
   async ngOnInit() {
+    await this.refreshProjectList();
+    console.log(this.dropDownOptions);
+  }
+
+  async refreshProjectList() {
     const binaries = await this.projectLoader.listAllBinaries();
     for (const binary of binaries) {
       this.dropDownOptions.push({
@@ -168,7 +174,6 @@ export class MainContainer implements OnInit {
         }
       })
     }
-    console.log(this.dropDownOptions);
   }
 
   async closeAndDeleteProject() {
@@ -186,8 +191,8 @@ export class MainContainer implements OnInit {
     this.dialogStore.showDialog({
       title: 'tiledWeb.saveDialog.title',
       description: 'tiledWeb.saveDialog.description',
-      action: () => {
-        console.log(this.newProjectName);
+      action: async () => {
+        return this.projectStore.safeOpenProjectAs(this.newProjectName);
       },
       template: temp,
       blocksUiInput: true

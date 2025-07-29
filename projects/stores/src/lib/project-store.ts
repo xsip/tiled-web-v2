@@ -34,7 +34,7 @@ export const ProjectStore = signalStore(
           let activeProjectBlob: Blob | undefined;
           if (activeProject)
             activeProjectBlob = new Blob([activeProject], {type: 'application/octet-stream'});
-          patchState(store, (state) => ({...state, openZipFileBlob: activeProjectBlob, arr: activeProject}))
+          patchState(store, (state) => ({...state, openZipFileBlob: activeProjectBlob, openZipFileUint8: activeProject}))
         },
         async updateZipFileBlob(file: File) {
           const bytes = await file.arrayBuffer();
@@ -47,6 +47,24 @@ export const ProjectStore = signalStore(
               openZipFileBlob: new Blob([arr], {type: 'application/octet-stream'}),
               openZipFileUint8: arr
             }))
+          }
+        },
+        async safeProjectAs(blob: Blob, projectName: string) {
+          const bytes = await blob.arrayBuffer();
+          if (bytes) {
+
+            const arr = new Uint8Array(bytes);
+            await projectLoader.setBinary(projectName, arr);
+          }
+        },
+        async safeOpenProjectAs(projectName: string) {
+          if(!store.openZipFileBlob())
+            return;
+          const bytes = await store.openZipFileBlob()!.arrayBuffer();
+          if (bytes) {
+
+            const arr = new Uint8Array(bytes);
+            await projectLoader.setBinary(projectName, arr);
           }
         }
       })
