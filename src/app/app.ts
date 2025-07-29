@@ -14,7 +14,6 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroEye} from '@ng-icons/heroicons/outline';
 
 
-
 export function placeVectorInGrid(input: Vector, gridSize: number) {
   return new Vector(closestGridPos(input.x, gridSize), closestGridPos(input.y, gridSize));
 }
@@ -60,7 +59,8 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
   template: `
     <tiled-web-ui-main-container
       (projectUpload)="projectUpload($event)"
-      (projectClosed)="projectClosed()"
+      (projectClosed)="closeProject()"
+      (openExisting)="openExisting($event)"
     >
       {{ jsonFilesOnly | json }}
       <div body class="h-full w-full flex ">
@@ -134,10 +134,10 @@ export class App implements OnInit {
   async ngOnInit() {
     await this.projectStore.init();
     const activeProject = await this.projectLoader.getBinary('active');
-    if(activeProject) {
+    if (activeProject) {
       this.cdr.markForCheck();
       this.loadedFromIndexedDb = true;
-      this.zipBlob = new Blob([activeProject], { type: 'application/octet-stream' });
+      this.zipBlob = new Blob([activeProject], {type: 'application/octet-stream'});
       const res2 = await jszip.loadAsync(this.zipBlob, {});
       this.zipFiles = Object.keys(res2.files).map(key => {
         return res2.files[key]
@@ -183,12 +183,29 @@ export class App implements OnInit {
 
   async projectUpload(file: File) {
     this.cdr.markForCheck();
-    await this.projectClosed();
+    await this.closeProject();
     const res = await jszip.loadAsync(file, {});
     this.zipFiles = Object.keys(res.files).map(key => {
       return res.files[key]
     });
     await this.projectStore.updateZipFileBlob(file);
+    this.cdr.detectChanges();
+  }
+
+  async openExisting(projectName: string) {
+    this.cdr.markForCheck();
+    await this.projectStore.openProject(projectName);
+
+    if (!this.projectStore.openZipFileBlob()) {
+      this.cdr.detectChanges();
+
+      return;
+    }
+    this.closeProject();
+    const res = await jszip.loadAsync(this.projectStore.openZipFileBlob()!, {});
+    this.zipFiles = Object.keys(res.files).map(key => {
+      return res.files[key]
+    });
     this.cdr.detectChanges();
   }
 
@@ -207,7 +224,6 @@ export class App implements OnInit {
 
   currentTilesetCanvas?: HTMLCanvasElement
   currentTilesetCtx?: CanvasRenderingContext2D;
-
 
 
   getMousePosTranformed(e: MouseEvent) {
@@ -234,7 +250,7 @@ export class App implements OnInit {
 
         setTimeout(() => {
           data!.canvas.onmousemove = this.getMousePosTranformed.bind(this);
-        },100);
+        }, 100);
         data?.draw();
       }, 100)
     }
@@ -258,7 +274,7 @@ export class App implements OnInit {
       const img = await TiledMapParser.createMapCanvas(res2, 0, 0, 1);
       const container = document.getElementById('container')! as HTMLDivElement;
       const oldCanvas = container.querySelector('canvas');
-      if(oldCanvas)
+      if (oldCanvas)
         container.removeChild(oldCanvas);
       container!.appendChild(img.canvas);
       img.canvas.style.width = container.clientWidth + 'px';
@@ -293,16 +309,16 @@ export class App implements OnInit {
     return this.zipFiles.filter(f => f.name.endsWith('.json'));
   }
 
-  projectClosed() {
+  closeProject() {
     this.cdr.markForCheck();
     const canvasContainer = document.getElementById('tilesetCanvas')! as HTMLDivElement;
     const canvas = canvasContainer?.querySelector('canvas');
-    if(canvas)
+    if (canvas)
       canvasContainer.removeChild(canvas);
 
     const container = document.getElementById('container')! as HTMLDivElement;
     const oldCanvas = container?.querySelector('canvas');
-    if(oldCanvas)
+    if (oldCanvas)
       container.removeChild(oldCanvas);
 
     this.zipBlob = undefined;

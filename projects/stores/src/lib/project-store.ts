@@ -28,9 +28,9 @@ export const ProjectStore = signalStore(
   withMethods((store) => {
       const projectLoader = inject(ProjectLoader);
       return ({
-        async init() {
 
-          const activeProject = await projectLoader.getBinary('active');
+        async openProject(name: string) {
+          const activeProject = await projectLoader.getBinary(name);
           let activeProjectBlob: Blob | undefined;
           if (activeProject)
             activeProjectBlob = new Blob([activeProject], {type: 'application/octet-stream'});
@@ -48,6 +48,10 @@ export const ProjectStore = signalStore(
               openZipFileUint8: arr
             }))
           }
+        },
+
+        async init() {
+
         },
         async safeProjectAs(blob: Blob, projectName: string) {
           const bytes = await blob.arrayBuffer();

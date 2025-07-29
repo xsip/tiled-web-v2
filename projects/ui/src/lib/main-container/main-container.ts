@@ -142,6 +142,7 @@ export class MainContainer implements OnInit {
   projectUpload = output<File>();
   projectClosed = output<void>();
   saveProjectAs = output<void>();
+  openExisting = output<string>();
   projectLoader = inject(ProjectLoader);
 
   dropDownOptions: DropdownOption[] = []
@@ -165,8 +166,8 @@ export class MainContainer implements OnInit {
         display() {
           return true;
         },
-        click() {
-
+        click: () => {
+          this.openExisting.emit(binary.key);
         },
         value: binary.key,
         additionalItemClass() {
@@ -192,7 +193,8 @@ export class MainContainer implements OnInit {
       title: 'tiledWeb.saveDialog.title',
       description: 'tiledWeb.saveDialog.description',
       action: async () => {
-        return this.projectStore.safeOpenProjectAs(this.newProjectName);
+        await this.projectStore.safeOpenProjectAs(this.newProjectName);
+        await this.refreshProjectList();
       },
       template: temp,
       blocksUiInput: true
