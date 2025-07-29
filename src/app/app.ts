@@ -202,6 +202,7 @@ export class App implements OnInit {
   }
 
   selectTileset(tileset?: TilesetExtended) {
+    this.cdr.markForCheck();
     if (tileset) {
       this.selectedTileset = tileset;
       const data = TiledMapParser.createTilesetCanvas(tileset);
@@ -219,10 +220,12 @@ export class App implements OnInit {
         data?.draw();
       }, 100)
     }
+    this.cdr.detectChanges();
   }
 
   async selectFile(file: JSZipObject) {
-    console.log(file);
+
+    this.cdr.markForCheck();
     const res = await file.async('string');
 
     const position = new Vector(0, 0);
@@ -266,6 +269,7 @@ export class App implements OnInit {
       FpsCtrl(10, drawWrapped);
       // requestAnimationFrame(drawWrapped);
     }
+    this.cdr.detectChanges();
   }
 
   get jsonFilesOnly() {
