@@ -6,12 +6,13 @@ import * as jszip from 'jszip';
 import {JSZipObject} from 'jszip';
 import Vector from 'vector2js';
 import {TilesetExtended, TmxJson} from '@tiled-web/models';
-import {CollectedMapData, ProjectLoader, TiledMapParser} from '@tiled-web/logic';
+import {CollectedMapData, ProjectLoader, TiledMapParser, TmxConverter} from '@tiled-web/logic';
 import {HttpClient} from '@angular/common/http';
 import {KeyboardHandlerService} from '@tiled-web/controls';
 import {JsonPipe} from '@angular/common';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroEye} from '@ng-icons/heroicons/outline';
+import {TiledMapParserTmx} from '../../projects/logic/src/lib/map-parser-tmx';
 
 
 export function placeVectorInGrid(input: Vector, gridSize: number) {
@@ -130,6 +131,7 @@ export class App implements OnInit {
   projectLoader = inject(ProjectLoader);
   projectStore = inject(ProjectStore);
 
+  tmxConverter = inject(TmxConverter);
 
   async ngOnInit() {
     await this.projectStore.init();
@@ -259,7 +261,16 @@ export class App implements OnInit {
 
   async selectFile(file: JSZipObject) {
     this.cdr.markForCheck();
-    const res = await file.async('string');
+    let res: string | undefined = await file.async('string');
+
+    if(file.name.endsWith('.tmx'))
+      res = await this.tmxConverter.convertTmxToJson(res);
+
+    if(!res) {
+      console.error('Couldnt convert tmx!!');
+      this.cdr.detectChanges();
+      return;
+    }
 
     const position = new Vector(0, 0);
 
@@ -269,9 +280,9 @@ export class App implements OnInit {
     if (res) {
       this.mapFile = JSON.parse(res);
       console.log(this.mapFile);
-      const res2 = await TiledMapParser.collectTileData(this.mapFile!, this.zipFiles);
+      const res2 = await (file.name.endsWith('.tmx') ? TiledMapParserTmx :  TiledMapParser ).collectTileData(this.mapFile!, this.zipFiles);
       this.tileData = res2;
-      const img = await TiledMapParser.createMapCanvas(res2, 0, 0, 1);
+      const img = await (file.name.endsWith('.tmx') ? TiledMapParserTmx :  TiledMapParser ).createMapCanvas(res2, 0, 0, 1);
       const container = document.getElementById('container')! as HTMLDivElement;
       const oldCanvas = container.querySelector('canvas');
       if (oldCanvas)
@@ -306,7 +317,7 @@ export class App implements OnInit {
   }
 
   get jsonFilesOnly() {
-    return this.zipFiles.filter(f => f.name.endsWith('.json'));
+    return this.zipFiles; // .filter(f => f.name.endsWith('.json'));
   }
 
   closeProject() {
