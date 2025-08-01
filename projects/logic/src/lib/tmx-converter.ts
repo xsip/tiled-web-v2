@@ -40,11 +40,11 @@ export class TmxConverter {
         }
         layer.width = parseInt(layer.width);
         layer.height = parseInt(layer.height);
+        layer.id = parseInt(layer.id + '');
         return layer;
       })
       map.width = parseInt(map.width);
       map.height = parseInt(map.height);
-
       map.tilewidth = parseInt(map.tilewidth);
       map.tileheight = parseInt(map.tileheight);
 

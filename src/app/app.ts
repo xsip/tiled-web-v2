@@ -282,14 +282,21 @@ export class App implements OnInit {
       console.log(this.mapFile);
       const res2 = await (file.name.endsWith('.tmx') ? TiledMapParserTmx :  TiledMapParser ).collectTileData(this.mapFile!, this.zipFiles);
       this.tileData = res2;
+      // @ts-ignore
+      window['td'] = this.tileData;
       const img = await (file.name.endsWith('.tmx') ? TiledMapParserTmx :  TiledMapParser ).createMapCanvas(res2, 0, 0, 1);
       const container = document.getElementById('container')! as HTMLDivElement;
       const oldCanvas = container.querySelector('canvas');
       if (oldCanvas)
         container.removeChild(oldCanvas);
       container!.appendChild(img.canvas);
+      img.canvas.style.width = img.canvas.width + 'px';
+      img.canvas.style.height = img.canvas.height + 'px';
+      /*
+
       img.canvas.style.width = container.clientWidth + 'px';
       img.canvas.style.height = container.clientHeight + 'px';
+       */
       const drawWrapped = () => {
         img.ctx.clearRect(0, 0, img.canvas.width, img.canvas.height);
         img.ctx.save();

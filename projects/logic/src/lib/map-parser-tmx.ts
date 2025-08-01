@@ -43,6 +43,8 @@ export class TiledMapParserTmx {
     const layersCpy = [...tiledMap.layers.map(layer => {
       return {
         ...layer,
+        // @ts-ignore
+        visible: layer.visible === '0' ? false : true,
         ids: []
       } as TileLayerExtended;
     })];
@@ -65,6 +67,7 @@ export class TiledMapParserTmx {
       i++;
       // titleSetIndex++;
     }
+    console.log(layersCpy);
 
     return {tiledMap, tilesets, layers: layersCpy};
   }
@@ -87,7 +90,7 @@ export class TiledMapParserTmx {
       map.imageheight = parseInt(map.image.height);
       map.imagewidth = parseInt(map.image.width);
       map.height = parseInt(map.image.height);
-      map.image = map.image.source
+      map.image = map.image.source;
       return JSON.stringify(map);
     } catch (err) {
       console.error('❌ Failed to convert:', err);
@@ -114,6 +117,7 @@ export class TiledMapParserTmx {
     });
     return {
       ...tilemap,
+      firstgid: parseInt(tilemap.firstgid+''),
       element: tileMapImage,
       data: tileMapJson,
       ids: [],
@@ -131,6 +135,7 @@ export class TiledMapParserTmx {
     });
     return {
       ..._tilemap,
+      firstgid: parseInt(_tilemap.firstgid+''),
       source: tileMapJson.image,
       element: tileMapImage,
       data: tileMapJson,
@@ -138,32 +143,6 @@ export class TiledMapParserTmx {
     }
   }
 
-  private static decodeTiledBase64Array(base64Chunks: string[]) {
-    // Join all strings into a single base64 string
-    const base64 = base64Chunks.join('');
-
-    // Decode base64 to binary string
-    const binary = atob(base64);
-
-    // Convert binary string to byte array
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-
-    // Convert every 4 bytes into a 32-bit little-endian integer (GID)
-    const gids = [];
-    for (let i = 0; i < bytes.length; i += 4) {
-      const gid =
-        bytes[i] |
-        (bytes[i + 1] << 8) |
-        (bytes[i + 2] << 16) |
-        (bytes[i + 3] << 24);
-      gids.push(gid);
-    }
-
-    return gids;
-  }
 
   private static decodeBase64Layer(base64: string) {
     const binary = atob(base64);
@@ -310,6 +289,7 @@ export class TiledMapParserTmx {
     const ctx = canvas.getContext('2d')!;
     canvas.width = collectedData.tiledMap.width * collectedData.tiledMap.tilewidth * upScale;// GlobalGameData.canvas!.width;
     canvas.height = collectedData.tiledMap.height * collectedData.tiledMap.tileheight * upScale;// GlobalGameData.canvas!.height;
+
     const draw = (data: CollectedMapData) => {
       for (const layer of collectedData.layers) {
 
@@ -324,9 +304,6 @@ export class TiledMapParserTmx {
           const row = (layer.data as number[])!.slice(i, layer.width! + i);
           mappedLayer.push(row);
         }
-        const sprites: Record<string, HTMLImageElement> = {};
-        // GlobalGameData.globalScale = 1;
-
 
         mappedLayer.forEach((row, rowIndex) => {
           row.forEach((col, colIndex) => {
