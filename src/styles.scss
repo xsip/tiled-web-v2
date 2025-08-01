@@ -12,17 +12,29 @@
   @apply visible z-50;
 }
 
+
+
+
 :root {
   --color-primary: rgba(235, 235, 235, 1);
   --color-primary-2: white;
   --color-secondary: rgba(35, 35, 35, 1);
+  --color-scrollbar-bg: rgba(255,255,255, 1);
+  --color-scrollbar-thumb: rgba(225, 225, 225, 1);
+
 }
 
 .dark {
   --color-primary: rgba(35, 35, 35, 1);
   --color-primary-2: rgba(55,55,55,1);
   --color-secondary: rgba(235, 235, 235, 1);
+
+  --color-scrollbar-bg: rgba(75, 75, 75, 1);
+  --color-scrollbar-thumb: rgba(35, 35, 35, 1);
+
 }
+
+
 
 
 
@@ -30,7 +42,8 @@
   --color-primary: var(--color-primary);
   --color-primary-2: var(--color-primary-2);
   --color-secondary: var(--color-secondary);
-
+  --color-scrollbar-track: var(--color-scrollbar-bg);
+  --color-scrollbar-thumb: var(--color-scrollbar-thumb);
 
   --animate-marquee: marquee 250s linear infinite;
   --animate-marquee2: marquee2 250s linear infinite;
@@ -56,6 +69,34 @@
       transform: translateX(0%);
     }
   }
+}
+
+
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply bg-scrollbar-track;
+}
+
+::-webkit-scrollbar-corner {
+  @apply bg-scrollbar-track;
+}
+
+.dark {
+  ::-webkit-scrollbar-track {
+    background-color: rgba(75, 75, 75, 1);
+  }
+  ::-webkit-scrollbar-corner {
+    background-color: rgba(75, 75, 75, 1);
+
+  }
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply bg-scrollbar-thumb;
 }
 
 body {

@@ -64,9 +64,9 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
       (openExisting)="openExisting($event)"
     >
       {{ jsonFilesOnly | json }}
-      <div body class="h-full w-full flex ">
+      <div body class="h-full w-full flex">
         @if (jsonFilesOnly.length && !tileData) {
-          <div class="flex flex-col">
+          <div class="flex flex-col h-full  overflow-y-scroll">
             @for (file of jsonFilesOnly; track file.name) {
               <div
                 class="cursor-pointer px-5  py-3 bg-primary-2 text-secondary text-gray-300  flex items-center flex-grow-0 flex-shrink-0">
@@ -89,7 +89,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
             }
           </div>
         }
-        <div id="container" class="h-full flex-1 overflow-scroll no-scrollbar"></div>
+        <div id="container" class="h-full flex-1 overflow-scroll"></div>
         @if (tileData) {
 
           <div class="h-full flex flex-col overflow-x-hidden overflow-y-scroll no-scrollbar w-[350px]">
