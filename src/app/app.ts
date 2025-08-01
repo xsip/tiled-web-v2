@@ -11,7 +11,7 @@ import {HttpClient} from '@angular/common/http';
 import {KeyboardHandlerService} from '@tiled-web/controls';
 import {JsonPipe} from '@angular/common';
 import {NgIcon, provideIcons} from '@ng-icons/core';
-import {heroEye} from '@ng-icons/heroicons/outline';
+import {heroEye, heroMagnifyingGlassMinus, heroMagnifyingGlassPlus} from '@ng-icons/heroicons/outline';
 import {TiledMapParserTmx} from '../../projects/logic/src/lib/map-parser-tmx';
 
 
@@ -55,7 +55,7 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
     Dialog
   ],
   providers: [
-    provideIcons({heroEye})
+    provideIcons({heroEye, heroMagnifyingGlassPlus,heroMagnifyingGlassMinus})
   ],
   template: `
     <tiled-web-ui-main-container
@@ -89,7 +89,18 @@ function FpsCtrl(fps: number, callback: (data: { time: number; frame: number; })
             }
           </div>
         }
-        <div id="container" class="h-full flex-1 overflow-scroll"></div>
+        <div id="container" class="h-full flex-1 overflow-scroll relative">
+
+          <!--<div
+            class="absolute left-0 bottom-0 w-full px-5 py-2 items-center bottom-2 bg-primary/80 text-secondary flex justify-between rounded-md">
+            <div class="transition-all ease-in-out duration-200 hover:scale-105">
+              <ng-icon size="30px" [name]="'heroMagnifyingGlassMinus'"/>
+            </div>
+            <div class="transition-all ease-in-out duration-200 hover:scale-105">
+              <ng-icon size="30px" [name]="'heroMagnifyingGlassPlus'"/>
+            </div>
+          </div>!-->
+        </div>
         @if (tileData) {
 
           <div class="h-full flex flex-col overflow-x-hidden overflow-y-scroll no-scrollbar w-[350px]">
