@@ -270,6 +270,10 @@ export class App implements OnInit {
     this.cdr.detectChanges();
   }
 
+
+  scale = 1.0;
+  scaleFactor = 1.1;
+
   async selectFile(file: JSZipObject) {
     this.cdr.markForCheck();
     let res: string | undefined = await file.async('string');
@@ -282,6 +286,8 @@ export class App implements OnInit {
       this.cdr.detectChanges();
       return;
     }
+
+
 
     const position = new Vector(0, 0);
 
@@ -308,11 +314,45 @@ export class App implements OnInit {
       img.canvas.style.width = container.clientWidth + 'px';
       img.canvas.style.height = container.clientHeight + 'px';
        */
+
+      img.canvas.addEventListener('wheel', (e) => {
+
+        if(!KeyboardHandlerService.isKeyDown('Shift'))
+          return;
+
+        e.preventDefault();
+
+        const zoom = e.deltaY < 0 ? this.scaleFactor : 1 / this.scaleFactor;
+
+        this.scale *= zoom;
+
+
+        const newWidth = img.canvas.width * (this.scale > 1 ? Math.floor(this.scale) : this.scale);
+        const newHeight = img.canvas.height * (this.scale > 1 ? Math.floor(this.scale) : this.scale);
+        img.canvas.style.width = newWidth + 'px';
+        img.canvas.style.height =  newHeight + 'px';
+
+
+      });
+
       const drawWrapped = () => {
-        img.ctx.clearRect(0, 0, img.canvas.width, img.canvas.height);
+
+        const newWidth = img.canvas.width * (this.scale > 1 ? Math.floor(this.scale) : this.scale);
+        const newHeight = img.canvas.height * (this.scale > 1 ? Math.floor(this.scale) : this.scale);
+
+
+        img.ctx.imageSmoothingEnabled = false;
+        img.ctx.clearRect(0, 0, img.canvas.width*4, img.canvas.height*4);
         img.ctx.save();
         img.ctx.translate(position.x, position.y);
-        img.draw(this.tileData!);
+
+        // scaling start
+        // img.ctx.scale(this.scale, this.scale);
+        // img.ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0); // Apply scaling
+        // img.ctx.clearRect(0, 0, img.canvas.width / this.scale, img.canvas.height / this.scale);
+        // scaling end
+
+        img.draw(this.tileData!, this.scale > 1 ? Math.floor(this.scale) : this.scale);
         img.ctx.restore();
         /*if(KeyboardHandlerService.isKeyDown('w')) {
           position.y--;

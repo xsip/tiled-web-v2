@@ -284,13 +284,13 @@ export class TiledMapParserTmx {
   }
 
   public static async createMapCanvas(
-    collectedData: CollectedMapData, x: number = 0, y: number = 0, upScale = 4) {
+    collectedData: CollectedMapData, x: number = 0, y: number = 0, _upScale = 4) {
     const canvas = document.createElement('canvas')!;
     const ctx = canvas.getContext('2d')!;
-    canvas.width = collectedData.tiledMap.width * collectedData.tiledMap.tilewidth * upScale;// GlobalGameData.canvas!.width;
-    canvas.height = collectedData.tiledMap.height * collectedData.tiledMap.tileheight * upScale;// GlobalGameData.canvas!.height;
+    canvas.width = collectedData.tiledMap.width * collectedData.tiledMap.tilewidth * _upScale;// GlobalGameData.canvas!.width;
+    canvas.height = collectedData.tiledMap.height * collectedData.tiledMap.tileheight * _upScale;// GlobalGameData.canvas!.height;
 
-    const draw = (data: CollectedMapData) => {
+    const draw = (data: CollectedMapData, upScale: number = 1.0) => {
       for (const layer of collectedData.layers) {
 
         if(!layer.visible)
@@ -330,10 +330,10 @@ export class TiledMapParserTmx {
                 id.y * frameSize.y,
                 frameSize.x,
                 frameSize.y,
-                pos.x,
-                pos.y,
-                frameSize.x * upScale,
-                frameSize.y * upScale
+                Math.round(pos.x),
+                Math.round(pos.y),
+                Math.round(frameSize.x * upScale),
+                Math.round(frameSize.y * upScale)
               );
               ctx!.globalAlpha = 1;
             }
